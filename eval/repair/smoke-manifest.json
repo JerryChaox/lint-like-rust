@@ -1,0 +1,33 @@
+{
+  "schema": "llr.repair-eval/1",
+  "status": "prepared_not_run",
+  "tasks": [
+    {
+      "task_id": "smoke-01",
+      "source_fixture": "tests/corpus_v2/read_file/mutated_error.py",
+      "sha256": "4d654245a4a45c924a1003c7287594541e107835bbcea631a2d39a729a35bc37",
+      "purpose": "workflow_smoke_only",
+      "origin": "synthetic_mutation",
+      "split": "development",
+      "agent_may_read_manifest": false
+    },
+    {
+      "task_id": "smoke-02",
+      "source_fixture": "tests/corpus_v2/read_file/cross_function_error.py",
+      "sha256": "41f139cfa64bbbf49b0b7fa54c8b37f7feaf9a0b7d1f29430857f1104c95f4fe",
+      "purpose": "workflow_smoke_only",
+      "origin": "synthetic_cross_function_refactor",
+      "split": "development",
+      "agent_may_read_manifest": false
+    },
+    {
+      "task_id": "smoke-03",
+      "source_fixture": "tests/corpus_v2/read_file/original.py",
+      "sha256": "fd21decb9f49a75bb74c1ec1ebda8eb92ab4e07fea893ae66f88a2b44aeca03d",
+      "purpose": "workflow_smoke_only",
+      "origin": "exact_source_excerpt_with_import_scaffolding",
+      "split": "development",
+      "agent_may_read_manifest": false
+    }
+  ]
+}

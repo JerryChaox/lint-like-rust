@@ -1,0 +1,302 @@
+{
+  "schema": "llr.repair-candidates/1",
+  "seed": 20260913,
+  "selection": "AST with open(name) syntax; seeded shuffle; at most one function per module; no llr results used",
+  "excluded_development_files": [
+    "apps/mobile-agent/brain/tick.py",
+    "apps/render-service/render_service/engine.py",
+    "apps/render-service/render_service/media_io.py",
+    "apps/sandbox-runtime/museon_sandbox_runtime/runtime_update.py"
+  ],
+  "eligible_function_count": 39,
+  "requested_candidates": 12,
+  "candidates": [
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/events.py",
+      "function": "_museoncli_context_fields",
+      "line_start": 262,
+      "line_end": 330,
+      "file_sha256": "1785dac1dd4dbd5984ca23a8983f4fa5ec2c52dfdcf2d6cfc6f495291e12e678",
+      "excerpt_sha256": "acecd4aa1c63ce4baa244f6f85003ed152bdafce41913800f3ca51296987a75d",
+      "resource_sites": [
+        {
+          "line": 280,
+          "receiver": "fh"
+        }
+      ],
+      "has_exception_handler": true,
+      "has_loop": false,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/api/app/script/extract_comments_text.py",
+      "function": "save_as_jsonl",
+      "line_start": 290,
+      "line_end": 304,
+      "file_sha256": "904998da2712eaac1fdb986c5367d91e7c36a1dd11fa74ec6b6f665d79eb88f5",
+      "excerpt_sha256": "50c7c593bac7d503fb894b310223ff75c76060641d91560eaf66baabbffd1db2",
+      "resource_sites": [
+        {
+          "line": 299,
+          "receiver": "f"
+        }
+      ],
+      "has_exception_handler": false,
+      "has_loop": true,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/agents/profiles/mel_sandbox/claude_plugins/museon-cloud-phone/scripts/watch_changes.py",
+      "function": "main",
+      "line_start": 72,
+      "line_end": 128,
+      "file_sha256": "ffb70f0c00553630b098999b1a6c0cd739bbe024fd2bcadacc1e488bd2f5892e",
+      "excerpt_sha256": "44dc8f3ccb2e82d472f37c9f47548853ac557f0e9bbea97c03e7d685368b036f",
+      "resource_sites": [
+        {
+          "line": 85,
+          "receiver": "handle"
+        },
+        {
+          "line": 123,
+          "receiver": "handle"
+        }
+      ],
+      "has_exception_handler": true,
+      "has_loop": true,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/agents/profiles/mel_sandbox/claude_plugins/museon-cloud-phone/scripts/clip_stream.py",
+      "function": "_fallback",
+      "line_start": 89,
+      "line_end": 116,
+      "file_sha256": "9bfb31ade92c5a30a1fd6e18e91dc57472e162647d2c2d80305a08810596dc9b",
+      "excerpt_sha256": "0d044268d14d76f913c660d660b036ab66e3284da348c200f310493a95ee801a",
+      "resource_sites": [
+        {
+          "line": 110,
+          "receiver": "fh"
+        }
+      ],
+      "has_exception_handler": false,
+      "has_loop": false,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/replacement_marker.py",
+      "function": "_read_runtime_replacement_marker",
+      "line_start": 49,
+      "line_end": 74,
+      "file_sha256": "1d53115327cb557d22f9b375b9a3f4df12653afeac0023bbba4a85e0bc770eb7",
+      "excerpt_sha256": "e89c7b19af4907f4512c99ffaf86df047abc2fcd17615e1356341f74b592d238",
+      "resource_sites": [
+        {
+          "line": 50,
+          "receiver": "handle"
+        }
+      ],
+      "has_exception_handler": false,
+      "has_loop": true,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/user_prompt_context.py",
+      "function": "_read_active_output_style_layer",
+      "line_start": 44,
+      "line_end": 59,
+      "file_sha256": "9f1db2468ee8e8fd86077be2e3d0c3ed090980638c86c71fe8a41411e1d8a3b8",
+      "excerpt_sha256": "a4321ee44663335f8226f868cf44dcdcf717cd46398ff016336d02c34126894d",
+      "resource_sites": [
+        {
+          "line": 49,
+          "receiver": "handle"
+        }
+      ],
+      "has_exception_handler": true,
+      "has_loop": true,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/session_worker.py",
+      "function": "_patch_museoncli_runtime_context",
+      "line_start": 1588,
+      "line_end": 1638,
+      "file_sha256": "f69f2da5e19cc8db4201e4f501ff502b15fe208a60d83de3b90d72cd4a3719e6",
+      "excerpt_sha256": "e80a36a56a516e4cc428ebebd27a05385bc4b99e8c4f76dd29ad2e5401a3ee03",
+      "resource_sites": [
+        {
+          "line": 1629,
+          "receiver": "fh"
+        },
+        {
+          "line": 1614,
+          "receiver": "fh"
+        }
+      ],
+      "has_exception_handler": true,
+      "has_loop": false,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/sandbox-runtime/pushed_scripts/bootstrap_ready_wait.py",
+      "function": "_ready_payload",
+      "line_start": 22,
+      "line_end": 28,
+      "file_sha256": "69f248031b129404b05fab79b01e2edff35b840ce5f41fdf4a0b80b789b181a7",
+      "excerpt_sha256": "a3ae66e2ec2c26ae64ba3df989b4f6b86c8489f905f57e855665ace3fe6dfae9",
+      "resource_sites": [
+        {
+          "line": 24,
+          "receiver": "handle"
+        }
+      ],
+      "has_exception_handler": true,
+      "has_loop": false,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/api/scripts/backfill_brief_music_from_preset.py",
+      "function": "_load_env",
+      "line_start": 28,
+      "line_end": 39,
+      "file_sha256": "7bc91271a101f79b4f8bb6779ce50784115148e1fc6986bbe86fb08b09a9be01",
+      "excerpt_sha256": "74c82c7b719e7da93a0dfc92bae733ad4ca9b678e9e0a5fd51cf9e14dd31b355",
+      "resource_sites": [
+        {
+          "line": 32,
+          "receiver": "f"
+        }
+      ],
+      "has_exception_handler": false,
+      "has_loop": true,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/api/setup_prefect.py",
+      "function": "load_env_file",
+      "line_start": 13,
+      "line_end": 28,
+      "file_sha256": "f7b07ebc2be8a7a3959c414608ddbe7214baaa07b3e452964280fe80b4bca880",
+      "excerpt_sha256": "6beaca62e33512c7efcfad5185ed51ebaa20736da8af6b3c1c2c0240cb99cbd7",
+      "resource_sites": [
+        {
+          "line": 18,
+          "receiver": "f"
+        }
+      ],
+      "has_exception_handler": false,
+      "has_loop": true,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/museoncli_wrapper.py",
+      "function": "_read",
+      "line_start": 15,
+      "line_end": 20,
+      "file_sha256": "fed9197817b2e474d1cdd799ab5ea2c0c143b1e1e52e0e0aabe1c6515a8a2a0f",
+      "excerpt_sha256": "7d5922df4cb02ebbcea956e961dff6e2b0e9296f26a91608cca499e19eb27453",
+      "resource_sites": [
+        {
+          "line": 17,
+          "receiver": "handle"
+        }
+      ],
+      "has_exception_handler": true,
+      "has_loop": false,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    },
+    {
+      "path": "apps/api/app/script/fetch_tiktok_comments_concurrent.py",
+      "function": "save_results",
+      "line_start": 312,
+      "line_end": 327,
+      "file_sha256": "56abb188d1f1b3c8eb806515abca814d35ad99902a5055c8cdb6f682eba10913",
+      "excerpt_sha256": "433c664e95e7b17e0fddbb43ec3122df7a152800d98c2b153e90df47de33d6b2",
+      "resource_sites": [
+        {
+          "line": 322,
+          "receiver": "f"
+        }
+      ],
+      "has_exception_handler": true,
+      "has_loop": false,
+      "status": "candidate_not_admitted",
+      "unproven": [
+        "builtin open identity",
+        "business contract",
+        "independence from development",
+        "mutation validity"
+      ]
+    }
+  ],
+  "parse_failures": [],
+  "admitted_tasks": 0,
+  "model_attempts": 0
+}

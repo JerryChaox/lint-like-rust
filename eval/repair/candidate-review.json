@@ -1,0 +1,78 @@
+{
+  "review_kind": "controller_initial_review_not_blinded",
+  "admitted": 0,
+  "rows": [
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/events.py",
+      "function": "_museoncli_context_fields",
+      "decision": "deferred",
+      "reason": "Cache, stat signature and global helper contracts need closure."
+    },
+    {
+      "path": "apps/api/app/script/extract_comments_text.py",
+      "function": "save_as_jsonl",
+      "decision": "draft",
+      "reason": "Loop write task prepared; logging scaffolding and independent review pending."
+    },
+    {
+      "path": "apps/agents/profiles/mel_sandbox/claude_plugins/museon-cloud-phone/scripts/watch_changes.py",
+      "function": "main",
+      "decision": "deferred",
+      "reason": "Device, polling, time and multiple output paths require external contracts."
+    },
+    {
+      "path": "apps/agents/profiles/mel_sandbox/claude_plugins/museon-cloud-phone/scripts/clip_stream.py",
+      "function": "_fallback",
+      "decision": "deferred",
+      "reason": "Subprocess and output file effects require contracts; target never executed."
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/replacement_marker.py",
+      "function": "_read_runtime_replacement_marker",
+      "decision": "draft",
+      "reason": "JSON read plus validation task prepared; independent review pending."
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/user_prompt_context.py",
+      "function": "_read_active_output_style_layer",
+      "decision": "deferred",
+      "reason": "Helper body and candidate-path/fallback globals required."
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/session_worker.py",
+      "function": "_patch_museoncli_runtime_context",
+      "decision": "deferred",
+      "reason": "Lock, atomic replacement, permissions and cache effects need review."
+    },
+    {
+      "path": "apps/sandbox-runtime/pushed_scripts/bootstrap_ready_wait.py",
+      "function": "_ready_payload",
+      "decision": "draft",
+      "reason": "Correct control prepared; shares json-read subgroup with marker task."
+    },
+    {
+      "path": "apps/api/scripts/backfill_brief_music_from_preset.py",
+      "function": "_load_env",
+      "decision": "deferred",
+      "reason": "Environment-loading cluster; redundant with load_env_file, requires environment semantics."
+    },
+    {
+      "path": "apps/api/setup_prefect.py",
+      "function": "load_env_file",
+      "decision": "deferred",
+      "reason": "Environment-loading cluster; do not count two loaders as independent mechanisms."
+    },
+    {
+      "path": "apps/sandbox-runtime/museon_sandbox_runtime/museoncli_wrapper.py",
+      "function": "_read",
+      "decision": "excluded_development_similarity",
+      "reason": "Near-clone of existing read_file development task, adds strip only."
+    },
+    {
+      "path": "apps/api/app/script/fetch_tiktok_comments_concurrent.py",
+      "function": "save_results",
+      "decision": "deferred",
+      "reason": "JSON writing overlap with json_lines; typed error handling may justify later inclusion."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+[package]
+name = "lint-like-rust"
+version = "0.1.0"
+edition = "2024"
+description = "Rust-inspired ownership, borrowing and resource analysis for Python"
+license = "MIT"
+
+[[bin]]
+name = "llr"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.9"
+ignore = "0.4"
+tree-sitter = "0.25"
+tree-sitter-python = "0.25.0"
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"
+

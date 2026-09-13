@@ -1,0 +1,7 @@
+# LoopX停滞触发器本机修复
+
+触发：已有replan ACK仍反复要求no_progress_streak。根因：触发模式中的stalled?缺少单词边界，在Next Action的installed中匹配stalled。
+
+本机运行中的LoopX release已将三个英文停滞词模式增加单词边界，并将stall/stalled写成明确可选后缀。installed/uninstalled/installation不触发；work stalled、stall streak、no-progress及中文停滞语句仍触发。运行原有autonomous-replan-obligation-smoke通过；同一goal/agent读取quota由autonomous_replan_required恢复run。
+
+仅修复本机已部署的release；未发布上游。将来升级LoopX可能覆盖本地补丁，需要再次检查该回归。此前任务拆分过细的执行问题仍成立，不因修复误报而视作已获得产品覆盖提升。

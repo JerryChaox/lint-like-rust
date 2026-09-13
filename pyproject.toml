@@ -1,0 +1,15 @@
+[build-system]
+requires = ["maturin>=1.8,<2"]
+build-backend = "maturin"
+
+[project]
+name = "lint-like-rust"
+version = "0.1.0"
+description = "Rust-inspired ownership, borrowing and resource analysis for Python"
+requires-python = ">=3.9"
+license = "MIT"
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Rust", "Topic :: Software Development :: Quality Assurance"]
+
+[tool.maturin]
+bindings = "bin"
+strip = true

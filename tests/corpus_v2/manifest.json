@@ -1,0 +1,343 @@
+{
+  "schema_version": "llr.corpus.v2/1",
+  "description": "Real Museon excerpts with explicitly synthetic error and repair variants. Expected outcomes are acceptance targets, not measured analyzer results. Never import or execute these fixtures.",
+  "source_root_hint": "/Users/jiaweichen/Documents/vscode/museon/museon",
+  "cases": [
+    {
+      "id": "read_file",
+      "source": {
+        "repository": "museon",
+        "checkout_head": "3000a4d0c1fd898a557100b1391758a39d98a8fd",
+        "path": "apps/sandbox-runtime/museon_sandbox_runtime/runtime_update.py",
+        "line_start": 38,
+        "line_end": 44,
+        "file_sha256": "768d6bbbdcad035043c4d8c9d60c2fe56b975817cec202c2d69abac9c4a8e0de",
+        "excerpt_sha256": "cce11efad7733533286bfa326fb4c25a85e42f3fe1876f2529ef4f63287f60cf",
+        "excerpt_path": "read_file/source_excerpt.py",
+        "snapshot_kind": "working_tree",
+        "imports_scaffolding": ""
+      },
+      "required_capabilities": [
+        "builtin_open",
+        "with_cleanup",
+        "exception_edges",
+        "resource_use",
+        "interprocedural_read_effect_for_refactor"
+      ],
+      "semantic_events": [
+        "open -> R1",
+        "with enter -> handle aliases R1",
+        "handle.read requires open R1",
+        "with exit closes R1 on return and exception",
+        "mutated_error moves read after with exit"
+      ],
+      "variants": {
+        "original": {
+          "path": "read_file/original.py",
+          "sha256": "fd21decb9f49a75bb74c1ec1ebda8eb92ab4e07fea893ae66f88a2b44aeca03d",
+          "expected_rules": [],
+          "expected_outcome": "verified_within_scope",
+          "scope": {
+            "property": "no read of file after context cleanup",
+            "assumptions": [
+              "builtins.open is not dynamically replaced",
+              "standard file context manager semantics"
+            ],
+            "not_proven": [
+              "filesystem availability",
+              "return contents",
+              "all arbitrary exceptions"
+            ],
+            "unknown_policy": "unresolved relevant effects must produce incomplete, never verified"
+          },
+          "origin": "exact_source_excerpt_with_import_scaffolding"
+        },
+        "mutated_error": {
+          "path": "read_file/mutated_error.py",
+          "sha256": "4d654245a4a45c924a1003c7287594541e107835bbcea631a2d39a729a35bc37",
+          "expected_rules": [
+            "LIFE001"
+          ],
+          "expected_outcome": "violation",
+          "scope": {
+            "property": "no read of file after context cleanup",
+            "assumptions": [
+              "builtins.open is not dynamically replaced",
+              "standard file context manager semantics"
+            ],
+            "not_proven": [
+              "filesystem availability",
+              "return contents",
+              "all arbitrary exceptions"
+            ],
+            "unknown_policy": "unresolved relevant effects must produce incomplete, never verified"
+          },
+          "origin": "synthetic_mutation"
+        },
+        "repaired": {
+          "path": "read_file/repaired.py",
+          "sha256": "fd21decb9f49a75bb74c1ec1ebda8eb92ab4e07fea893ae66f88a2b44aeca03d",
+          "expected_rules": [],
+          "expected_outcome": "verified_within_scope",
+          "scope": {
+            "property": "no read of file after context cleanup",
+            "assumptions": [
+              "builtins.open is not dynamically replaced",
+              "standard file context manager semantics"
+            ],
+            "not_proven": [
+              "filesystem availability",
+              "return contents",
+              "all arbitrary exceptions"
+            ],
+            "unknown_policy": "unresolved relevant effects must produce incomplete, never verified"
+          },
+          "origin": "synthetic_repair_restoring_original"
+        },
+        "cross_function_error": {
+          "path": "read_file/cross_function_error.py",
+          "sha256": "41f139cfa64bbbf49b0b7fa54c8b37f7feaf9a0b7d1f29430857f1104c95f4fe",
+          "expected_rules": [
+            "LIFE001"
+          ],
+          "expected_outcome": "violation",
+          "scope": {
+            "property": "no read of file after context cleanup",
+            "assumptions": [
+              "builtins.open is not dynamically replaced",
+              "standard file context manager semantics"
+            ],
+            "not_proven": [
+              "filesystem availability",
+              "return contents",
+              "all arbitrary exceptions"
+            ],
+            "unknown_policy": "unresolved relevant effects must produce incomplete, never verified"
+          },
+          "origin": "synthetic_cross_function_refactor"
+        },
+        "cross_function_repaired": {
+          "path": "read_file/cross_function_repaired.py",
+          "sha256": "29cf517a1944ab19df262eedd5fc8be1eb95fe25a26b133de8abcc9d46d3cdbc",
+          "expected_rules": [],
+          "expected_outcome": "verified_within_scope",
+          "scope": {
+            "property": "no read of file after context cleanup",
+            "assumptions": [
+              "builtins.open is not dynamically replaced",
+              "standard file context manager semantics"
+            ],
+            "not_proven": [
+              "filesystem availability",
+              "return contents",
+              "all arbitrary exceptions"
+            ],
+            "unknown_policy": "unresolved relevant effects must produce incomplete, never verified"
+          },
+          "origin": "synthetic_cross_function_refactor"
+        }
+      },
+      "current_result": "not_evaluated",
+      "mutation_is_existing_bug": false
+    },
+    {
+      "id": "path_sha256",
+      "source": {
+        "repository": "museon",
+        "checkout_head": "3000a4d0c1fd898a557100b1391758a39d98a8fd",
+        "path": "apps/render-service/render_service/media_io.py",
+        "line_start": 151,
+        "line_end": 157,
+        "file_sha256": "8131ee503ada103c33cd42070095656854676600991c57f4b260a2ad5be32f11",
+        "excerpt_sha256": "808803616828bf80257e2f5bf5f850901be5de8f81dbed3f047739511cdc09d8",
+        "excerpt_path": "path_sha256/source_excerpt.py",
+        "snapshot_kind": "working_tree",
+        "imports_scaffolding": "import hashlib\nfrom pathlib import Path"
+      },
+      "required_capabilities": [
+        "import_resolution",
+        "parameter_type_Path",
+        "Path_open",
+        "closure_capture",
+        "sentinel_iterator_eager_consumption",
+        "loop_fixed_point",
+        "with_cleanup"
+      ],
+      "semantic_events": [
+        "parameter path resolves pathlib.Path",
+        "Path.open -> R1",
+        "handle aliases R1",
+        "lambda captures handle without reading yet",
+        "sentinel iterator invokes lambda while context is active",
+        "handle.read requires open R1",
+        "digest uses bytes independent of R1",
+        "with exit closes R1"
+      ],
+      "variants": {
+        "original": {
+          "path": "path_sha256/original.py",
+          "sha256": "dda04bc5cf588a973319dd8f3e389adeb8b0bd73ace783b1684912a37f3b1e72",
+          "expected_rules": [],
+          "expected_outcome": "verified_within_scope",
+          "scope": {
+            "property": "reads of R1 happen before close",
+            "assumptions": [
+              "path is a standard pathlib.Path instance as annotated",
+              "standard hashlib and iter semantics"
+            ],
+            "not_proven": [
+              "digest correctness",
+              "termination",
+              "custom Path subclasses",
+              "unmodeled callback effects"
+            ],
+            "unknown_policy": "if lambda/iterator invocation is unsupported report incomplete, not success"
+          },
+          "origin": "exact_source_excerpt_with_import_scaffolding"
+        },
+        "mutated_error": {
+          "path": "path_sha256/mutated_error.py",
+          "sha256": "49650db11fb57edfb0de514a7be4aa01f2c3d01aa1c22247a4013dabbdf539f5",
+          "expected_rules": [
+            "LIFE001"
+          ],
+          "expected_outcome": "violation",
+          "scope": {
+            "property": "reads of R1 happen before close",
+            "assumptions": [
+              "path is a standard pathlib.Path instance as annotated",
+              "standard hashlib and iter semantics"
+            ],
+            "not_proven": [
+              "digest correctness",
+              "termination",
+              "custom Path subclasses",
+              "unmodeled callback effects"
+            ],
+            "unknown_policy": "if lambda/iterator invocation is unsupported report incomplete, not success"
+          },
+          "origin": "synthetic_mutation"
+        },
+        "repaired": {
+          "path": "path_sha256/repaired.py",
+          "sha256": "dda04bc5cf588a973319dd8f3e389adeb8b0bd73ace783b1684912a37f3b1e72",
+          "expected_rules": [],
+          "expected_outcome": "verified_within_scope",
+          "scope": {
+            "property": "reads of R1 happen before close",
+            "assumptions": [
+              "path is a standard pathlib.Path instance as annotated",
+              "standard hashlib and iter semantics"
+            ],
+            "not_proven": [
+              "digest correctness",
+              "termination",
+              "custom Path subclasses",
+              "unmodeled callback effects"
+            ],
+            "unknown_policy": "if lambda/iterator invocation is unsupported report incomplete, not success"
+          },
+          "origin": "synthetic_repair_restoring_original"
+        }
+      },
+      "current_result": "not_evaluated",
+      "mutation_is_existing_bug": false
+    },
+    {
+      "id": "append_brain_log",
+      "source": {
+        "repository": "museon",
+        "checkout_head": "3000a4d0c1fd898a557100b1391758a39d98a8fd",
+        "path": "apps/mobile-agent/brain/tick.py",
+        "line_start": 42,
+        "line_end": 46,
+        "file_sha256": "1d01eb663554b61ea7203fef3f360fd3d5d1b362e0a18861dc2d513c99818503",
+        "excerpt_sha256": "aebadcec7c6bd8a6c4d0cd35fdd034a5a1400dbdda8e5f4f604eb7f85529dab2",
+        "excerpt_path": "append_brain_log/source_excerpt.py",
+        "snapshot_kind": "working_tree",
+        "imports_scaffolding": "import json\nfrom pathlib import Path"
+      },
+      "required_capabilities": [
+        "import_resolution",
+        "Path_constructor",
+        "Path_div_operator",
+        "formatted_strings",
+        "Path_open",
+        "json_dumps_effect",
+        "with_cleanup"
+      ],
+      "semantic_events": [
+        "Path(state_root) and path / components produce Path values",
+        "mkdir runs before resource acquisition",
+        "Path.open -> R1",
+        "f aliases R1",
+        "json.dumps produces text without resource alias",
+        "f.write requires open R1",
+        "with exit closes R1"
+      ],
+      "variants": {
+        "original": {
+          "path": "append_brain_log/original.py",
+          "sha256": "8bde5ece2813b890a506bf0b6d7a2bbdbc9f729e8ceaf82f453ae9492fae733f",
+          "expected_rules": [],
+          "expected_outcome": "verified_within_scope",
+          "scope": {
+            "property": "writes of R1 happen before close",
+            "assumptions": [
+              "standard pathlib.Path and json module behavior"
+            ],
+            "not_proven": [
+              "parent directory permissions",
+              "serialization success",
+              "atomic writes"
+            ],
+            "unknown_policy": "relevant unresolved effects must produce incomplete, never verified"
+          },
+          "origin": "exact_source_excerpt_with_import_scaffolding"
+        },
+        "mutated_error": {
+          "path": "append_brain_log/mutated_error.py",
+          "sha256": "73d8fd9e25c06eb7bc8af30faf9555cefd5071d2fc6ab7b90393252e29633ef7",
+          "expected_rules": [
+            "LIFE001"
+          ],
+          "expected_outcome": "violation",
+          "scope": {
+            "property": "writes of R1 happen before close",
+            "assumptions": [
+              "standard pathlib.Path and json module behavior"
+            ],
+            "not_proven": [
+              "parent directory permissions",
+              "serialization success",
+              "atomic writes"
+            ],
+            "unknown_policy": "relevant unresolved effects must produce incomplete, never verified"
+          },
+          "origin": "synthetic_mutation"
+        },
+        "repaired": {
+          "path": "append_brain_log/repaired.py",
+          "sha256": "8bde5ece2813b890a506bf0b6d7a2bbdbc9f729e8ceaf82f453ae9492fae733f",
+          "expected_rules": [],
+          "expected_outcome": "verified_within_scope",
+          "scope": {
+            "property": "writes of R1 happen before close",
+            "assumptions": [
+              "standard pathlib.Path and json module behavior"
+            ],
+            "not_proven": [
+              "parent directory permissions",
+              "serialization success",
+              "atomic writes"
+            ],
+            "unknown_policy": "relevant unresolved effects must produce incomplete, never verified"
+          },
+          "origin": "synthetic_repair_restoring_original"
+        }
+      },
+      "current_result": "not_evaluated",
+      "mutation_is_existing_bug": false
+    }
+  ]
+}

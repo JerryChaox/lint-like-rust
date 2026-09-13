@@ -1,0 +1,16 @@
+/target/
+/dist/
+*.egg-info/
+__pycache__/
+.venv/
+/reports/**/*.json
+
+
+.loopx/
+.codex/goals/
+
+# Museon proprietary source copies — never publish
+/reports/museon-real-code/
+/eval/repair/pilot-draft/
+/reports/v2/pilot-exploration/
+/reports/v2/repair-smoke-runs/

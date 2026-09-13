@@ -1,0 +1,7 @@
+- id: llr
+  name: llr
+  description: Check Python ownership, borrowing and resource lifetimes
+  entry: llr check
+  language: python
+  types: [python]
+  require_serial: true

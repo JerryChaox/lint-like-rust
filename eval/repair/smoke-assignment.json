@@ -1,0 +1,127 @@
+{
+  "schema": "llr.repair-runs/1",
+  "purpose": "workflow_smoke_only",
+  "shuffle_seed": 20260913,
+  "isolation_verified": false,
+  "environment": {
+    "model": "gpt-6-astra",
+    "reasoning": "medium",
+    "token_limit": {
+      "observed_rejection_above": 60000,
+      "hard_limit": false
+    },
+    "tool_call_limit": 0,
+    "ruff": "0.12.12",
+    "pyright": "1.1.414",
+    "llr_binary_sha256": null,
+    "llr_semantics": null,
+    "max_rounds": 1,
+    "max_seconds": 180
+  },
+  "attempts": [
+    {
+      "attempt_id": "attempt-01",
+      "task_id": "smoke-02",
+      "arm": "baseline",
+      "input_sha256": "41f139cfa64bbbf49b0b7fa54c8b37f7feaf9a0b7d1f29430857f1104c95f4fe",
+      "status": "exploratory_completed",
+      "rounds": [
+        1
+      ],
+      "semantic_verdict": "correct",
+      "llr_verdict": null,
+      "coverage_change": null,
+      "functional_regression": null,
+      "tokens": 12985,
+      "cost": null,
+      "elapsed_seconds": 9.71
+    },
+    {
+      "attempt_id": "attempt-02",
+      "task_id": "smoke-02",
+      "arm": "llr",
+      "input_sha256": "41f139cfa64bbbf49b0b7fa54c8b37f7feaf9a0b7d1f29430857f1104c95f4fe",
+      "status": "exploratory_completed",
+      "rounds": [
+        1
+      ],
+      "semantic_verdict": "correct",
+      "llr_verdict": null,
+      "coverage_change": null,
+      "functional_regression": null,
+      "tokens": 14314,
+      "cost": null,
+      "elapsed_seconds": 9.38
+    },
+    {
+      "attempt_id": "attempt-03",
+      "task_id": "smoke-03",
+      "arm": "llr",
+      "input_sha256": "fd21decb9f49a75bb74c1ec1ebda8eb92ab4e07fea893ae66f88a2b44aeca03d",
+      "status": "exploratory_completed",
+      "rounds": [
+        1
+      ],
+      "semantic_verdict": "correct",
+      "llr_verdict": null,
+      "coverage_change": null,
+      "functional_regression": null,
+      "tokens": 13887,
+      "cost": null,
+      "elapsed_seconds": 9.18
+    },
+    {
+      "attempt_id": "attempt-04",
+      "task_id": "smoke-01",
+      "arm": "llr",
+      "input_sha256": "4d654245a4a45c924a1003c7287594541e107835bbcea631a2d39a729a35bc37",
+      "status": "exploratory_completed",
+      "rounds": [
+        1
+      ],
+      "semantic_verdict": "correct",
+      "llr_verdict": null,
+      "coverage_change": null,
+      "functional_regression": null,
+      "tokens": 14060,
+      "cost": null,
+      "elapsed_seconds": 9.47
+    },
+    {
+      "attempt_id": "attempt-05",
+      "task_id": "smoke-03",
+      "arm": "baseline",
+      "input_sha256": "fd21decb9f49a75bb74c1ec1ebda8eb92ab4e07fea893ae66f88a2b44aeca03d",
+      "status": "exploratory_completed",
+      "rounds": [
+        1
+      ],
+      "semantic_verdict": "correct",
+      "llr_verdict": null,
+      "coverage_change": null,
+      "functional_regression": null,
+      "tokens": 12950,
+      "cost": null,
+      "elapsed_seconds": 11.21
+    },
+    {
+      "attempt_id": "attempt-06",
+      "task_id": "smoke-01",
+      "arm": "baseline",
+      "input_sha256": "4d654245a4a45c924a1003c7287594541e107835bbcea631a2d39a729a35bc37",
+      "status": "exploratory_completed",
+      "rounds": [
+        1
+      ],
+      "semantic_verdict": "correct",
+      "llr_verdict": null,
+      "coverage_change": null,
+      "functional_regression": null,
+      "tokens": 12955,
+      "cost": null,
+      "elapsed_seconds": 8.47
+    }
+  ],
+  "experiment_kind": "exploratory_trace_audited_smoke",
+  "status": "completed"
+}
