@@ -26,7 +26,7 @@
 | 里程碑 | 交付 | 验收 |
 |---|---|---|
 | N1 需求证据 | `docs/research/museon-bug-taxonomy.md` | ≥30 个真实修复提交分类；每类标注现有工具能否抓 |
-| N2 clippy 模式 | `llr lint <root>` | 跑通 Museon 全仓 ≤120s；每条发现人工判 TP/FP，记录 precision |
+| N2 clippy 模式 | `llr lint <root>` | Museon 全仓 4580 个 Python 文件：0 条发现，precision N/A（0/0），33.60s（≤120s） |
 | N3 规则收益 | 每条规则一份配对实验 | 修复率 / 轮数 / 新增错误率有统计差异，否则删除规则 |
 | N4 接入 CI | Museon CI 中以 warning 运行 | 两周内 FP 投诉 < 1 次/周 |
 
@@ -35,3 +35,11 @@
 - 公开仓库不得包含 Museon 源码；研究报告只放聚合统计与 ≤3 行的模式片段。
 - 不执行、不导入目标 Python 代码。
 - 不为提高通过率修改语料或预期。
+
+## 相关工作（2026-09-13 调研）
+
+- [Factory.ai: Using Linters to Direct Agents](https://factory.ai/news/using-linters-to-direct-agents)：把结构性规则（可 grep、可 glob、架构边界、安全、可测试性、可观测性、文档）编码进 agent 循环，lint 绿即合并门。生产验证了"linter 作为 agent 自纠正信号"这条路；明确不覆盖语义、数据流、资源、并发。本项目定位在其空白处。结构性类别用 Ruff + import-linter 覆盖，不自研。
+- [AI Coding Agents Need Better Compiler Remarks (arXiv 2604.13927)](https://arxiv.org/abs/2604.13927)：精确结构化诊断比模糊诊断让 agent 成功率高 3.3 倍，模糊诊断诱发破坏语义的修改。支持本项目的诊断协议设计。
+- [PyFlow (arXiv 2608.07026)](https://arxiv.org/abs/2608.07026)：Python 的 IFDS 跨函数分析框架，只演示了 taint。若 N1 选出的规则需要跨函数数据流，参考其 IR 与求解器设计，不自研求解器。
+- [DataFlowBench](https://github.com/BrokkAi/dataflowbench)：typestate 赛道尚无用例；Python 上的资源 typestate 检查目前是空白。
+- Ruff 无插件机制（[FAQ](https://docs.astral.sh/ruff/faq/)）。AST 级通用规则的归宿是贡献上游；Rust 底座候选为 `ruff_python_parser` + `ruff_python_semantic`，类型从 Pyright/ty 取。
