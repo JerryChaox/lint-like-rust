@@ -46,6 +46,10 @@ pub struct SemanticFacts {
     pub standard_models_blocked: bool,
     /// Explicit CLI roots have no supplied caller values.
     pub unbound_entries: BTreeSet<String>,
+    /// Best-effort linting treats unsupported behavior as having no tracked
+    /// effect. This is deliberately unsound and must never be enabled by the
+    /// proof-oriented `analyze` command.
+    pub benign_unknowns: bool,
 }
 
 struct Source {
@@ -301,12 +305,13 @@ pub fn lower_project_with_facts(
             }
             if !changed {
                 let mut program = lower_all(&parsed, &facts).0;
-                if program
-                    .functions
-                    .iter()
-                    .flat_map(|f| &f.blocks)
-                    .flat_map(|b| &b.operations)
-                    .any(|i| matches!(i.kind, Kind::GlobalMutationUnknown { .. }))
+                if !facts.benign_unknowns
+                    && program
+                        .functions
+                        .iter()
+                        .flat_map(|f| &f.blocks)
+                        .flat_map(|b| &b.operations)
+                        .any(|i| matches!(i.kind, Kind::GlobalMutationUnknown { .. }))
                 {
                     facts.standard_models_blocked = true;
                     program = lower_all(&parsed, &facts).0;
@@ -315,7 +320,7 @@ pub fn lower_project_with_facts(
                 // caller may mutate methods before invoking an otherwise pure
                 // helper that constructs an instance and acquires a new file.
                 // Disconnected entry components need not lose exact dispatch.
-                if !facts.classes.is_empty() {
+                if !facts.benign_unknowns && !facts.classes.is_empty() {
                     let blocked = class_effect_components(&program);
                     if !blocked.is_empty() {
                         facts.blocked_class_dispatch.extend(blocked);
@@ -780,7 +785,7 @@ fn lower_all(
                 f.inert = inert.clone();
                 f.local_modules = local_modules.clone();
                 f.unstable = unstable.clone();
-                if !inert.contains(&s.module) {
+                if !inert.contains(&s.module) && !facts.benign_unknowns {
                     f.unknown(
                         *n,
                         "Executable module initialization is not modeled for function entry",
@@ -805,7 +810,7 @@ fn lower_all(
                 }
                 f.shadow_locals(field(*n, "body").unwrap());
                 let name = text(&s.text, field(*n, "name").unwrap());
-                if unstable.contains(name) || deferred_body(*n) {
+                if (unstable.contains(name) || deferred_body(*n)) && !facts.benign_unknowns {
                     f.unknown(
                         *n,
                         "Function temporal binding or deferred coroutine/generator execution is unresolved",

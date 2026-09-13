@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "sample_size": 30,
+  "history_tip": "3000a4d0",
+  "sample_date_min": "2026-08-19",
+  "sample_date_max": "2026-08-24",
+  "selection": {
+    "branch": "main reachable history",
+    "merge_commits_excluded": true,
+    "message_signals": ["fix", "bug", "修复", "hotfix", "regression"],
+    "python_only_diff": true
+  },
+  "tools": {
+    "ruff": "0.13.0",
+    "ruff_arguments": ["check", "--select", "ALL", "--output-format", "json"],
+    "pyright": "1.1.405",
+    "pyright_arguments": ["--level", "error", "--outputjson"],
+    "pyright_mode": "strict",
+    "python_version": "3.12"
+  },
+  "hit_policy": "A diagnostic must land on the parent-side changed range (or a pure-addition anchor) and semantically identify the defect corrected by the commit.",
+  "categories": [
+    {"category": "外部接口与序列化契约", "count": 6, "ruff_hits": 0, "pyright_hits": 0, "any_tool_hits": 0},
+    {"category": "状态与分支遗漏", "count": 5, "ruff_hits": 0, "pyright_hits": 0, "any_tool_hits": 0},
+    {"category": "数据完整性与分页", "count": 5, "ruff_hits": 0, "pyright_hits": 0, "any_tool_hits": 0},
+    {"category": "运行环境与部署边界", "count": 5, "ruff_hits": 0, "pyright_hits": 0, "any_tool_hits": 0},
+    {"category": "并发幂等与共享状态", "count": 4, "ruff_hits": 0, "pyright_hits": 0, "any_tool_hits": 0},
+    {"category": "布局与资源上限", "count": 3, "ruff_hits": 0, "pyright_hits": 0, "any_tool_hits": 0},
+    {"category": "异常与失败传播", "count": 1, "ruff_hits": 1, "pyright_hits": 0, "any_tool_hits": 1},
+    {"category": "输入形状与空值", "count": 1, "ruff_hits": 0, "pyright_hits": 0, "any_tool_hits": 0}
+  ],
+  "totals": {"ruff_hits": 1, "pyright_hits": 0, "any_tool_hits": 1}
+}

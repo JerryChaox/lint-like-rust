@@ -2,7 +2,7 @@
 use clap::{Args, ValueEnum};
 use lint_like_rust::{diagnostics_v2 as d, frontend_v2, report_v2, solver_v2};
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
 };
@@ -29,6 +29,16 @@ pub struct AnalyzeArgs {
     /// Explicit caller assertions for entry parameters; verification is conditional on them.
     #[arg(long)]
     pub entry_contract: Option<PathBuf>,
+}
+#[derive(Args)]
+pub struct LintArgs {
+    /// Python project root, or one Python file.
+    pub root: PathBuf,
+    /// Qualified entry function(s); defaults to every discovered function and method.
+    #[arg(long)]
+    pub entry: Vec<String>,
+    #[arg(long, value_enum, default_value = "text")]
+    pub format: Format,
 }
 #[derive(Args)]
 pub struct CompareArgs {
@@ -240,6 +250,192 @@ fn analyze_inner(args: &AnalyzeArgs) -> Result<i32, String> {
     emit(&args.output, &output)?;
     Ok(status)
 }
+
+#[derive(serde::Serialize)]
+struct LintLocation {
+    path: String,
+    line: usize,
+    column: usize,
+}
+
+#[derive(serde::Serialize)]
+struct LintEvidenceStep {
+    path: String,
+    line: usize,
+}
+
+#[derive(serde::Serialize)]
+struct LintFinding {
+    rule: String,
+    location: LintLocation,
+    reason: String,
+    evidence_chain: Vec<LintEvidenceStep>,
+    suggested_fix: String,
+}
+
+#[derive(serde::Serialize)]
+struct LintReport {
+    schema_version: u32,
+    files: usize,
+    findings: Vec<LintFinding>,
+}
+
+fn suggested_fix(rule: &str) -> &'static str {
+    if rule == "LIFE001" {
+        "Move the access before the modeled close, or acquire a fresh valid resource while preserving cleanup."
+    } else if rule.starts_with("BOR") {
+        "Release the conflicting view before this operation and preserve readonly and ownership restrictions."
+    } else if rule.starts_with("OWN") {
+        "Use the modeled transfer recipient, or move the access before the ownership transfer."
+    } else {
+        "Handle the modeled result or operation according to the rule contract."
+    }
+}
+
+fn lint_inner(args: &LintArgs) -> Result<i32, String> {
+    let sources = collect(&args.root)?;
+    let facts = frontend_v2::SemanticFacts {
+        unbound_entries: args.entry.iter().cloned().collect(),
+        benign_unknowns: true,
+        ..Default::default()
+    };
+    let mut program = frontend_v2::lower_project_with_facts(&sources, Path::new(""), &facts)?;
+    if args.entry.is_empty() {
+        program.roots = program
+            .functions
+            .iter()
+            .filter(|function| !function.id.ends_with("::<module>"))
+            .map(|function| function.id.clone())
+            .collect();
+    } else {
+        for name in &args.entry {
+            if !program
+                .functions
+                .iter()
+                .any(|function| &function.id == name)
+            {
+                return Err(format!(
+                    "Unknown entry {name}; available: {}",
+                    program
+                        .functions
+                        .iter()
+                        .map(|function| function.id.as_str())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                ));
+            }
+        }
+        program.roots = args.entry.clone();
+    }
+
+    let analysis = solver_v2::lint(&program);
+    let mut unique = BTreeMap::new();
+    for finding in analysis.findings {
+        // Possible findings are derived from joined fact sets. The v2 solver
+        // explicitly does not claim those sets form an ordered feasible path,
+        // so they cannot satisfy lint's direct-evidence requirement.
+        if finding.certainty != solver_v2::Certainty::Definite {
+            continue;
+        }
+        if !matches!(
+            finding.rule.as_str(),
+            "LIFE001" | "OWN001" | "OWN002" | "ERR001"
+        ) && !finding.rule.starts_with("BOR")
+        {
+            continue;
+        }
+        let mut evidence_chain = Vec::new();
+        for step in finding.trace {
+            let evidence = LintEvidenceStep {
+                path: step.site.path,
+                line: step.site.span.line,
+            };
+            if !evidence_chain.iter().any(|old: &LintEvidenceStep| {
+                old.path == evidence.path && old.line == evidence.line
+            }) {
+                evidence_chain.push(evidence);
+            }
+        }
+        if !evidence_chain
+            .iter()
+            .any(|old| old.path == finding.site.path && old.line == finding.site.span.line)
+        {
+            evidence_chain.push(LintEvidenceStep {
+                path: finding.site.path.clone(),
+                line: finding.site.span.line,
+            });
+        }
+        let result = LintFinding {
+            suggested_fix: suggested_fix(&finding.rule).into(),
+            rule: finding.rule.clone(),
+            location: LintLocation {
+                path: finding.site.path.clone(),
+                line: finding.site.span.line,
+                column: finding.site.span.column,
+            },
+            reason: finding.message.clone(),
+            evidence_chain,
+        };
+        unique
+            .entry((
+                finding.rule,
+                finding.site.path,
+                finding.site.span.line,
+                finding.site.span.column,
+                finding.message,
+            ))
+            .or_insert(result);
+    }
+    let report = LintReport {
+        schema_version: 1,
+        files: sources.len(),
+        findings: unique.into_values().collect(),
+    };
+    match args.format {
+        Format::Json => println!(
+            "{}",
+            serde_json::to_string_pretty(&report).map_err(|error| error.to_string())?
+        ),
+        Format::Text => {
+            for finding in &report.findings {
+                println!(
+                    "{}:{}:{}: {}: {}",
+                    finding.location.path,
+                    finding.location.line,
+                    finding.location.column,
+                    finding.rule,
+                    finding.reason
+                );
+                let chain = finding
+                    .evidence_chain
+                    .iter()
+                    .map(|step| format!("{}:{}", step.path, step.line))
+                    .collect::<Vec<_>>()
+                    .join(" -> ");
+                println!("  evidence: {chain}");
+                println!("  fix: {}", finding.suggested_fix);
+            }
+            println!(
+                "{} files; {} findings; exit {}",
+                report.files,
+                report.findings.len(),
+                usize::from(!report.findings.is_empty())
+            );
+        }
+    }
+    Ok(i32::from(!report.findings.is_empty()))
+}
+
+pub fn lint(args: LintArgs) -> i32 {
+    match lint_inner(&args) {
+        Ok(status) => status,
+        Err(error) => {
+            eprintln!("ERROR: {error}");
+            2
+        }
+    }
+}
+
 pub fn analyze(args: AnalyzeArgs) -> i32 {
     match analyze_inner(&args) {
         Ok(s) => s,

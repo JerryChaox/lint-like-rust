@@ -336,9 +336,11 @@ struct RunOutcome {
 }
 struct Solver<'a> {
     program: &'a Program,
+    function_index: BTreeMap<String, usize>,
     obligations: BTreeMap<String, Obligation>,
     findings: BTreeMap<String, Finding>,
     steps: usize,
+    benign_unknowns: bool,
 }
 impl Solver<'_> {
     #[allow(clippy::too_many_arguments)]
@@ -737,17 +739,19 @@ impl Solver<'_> {
                         || b.objects.iter().any(|id| !state.objects.contains_key(id))
                     {
                         store_binding(&mut state, target, missing());
-                        taint(&mut state, &[], site, "Unresolved field write receiver");
-                        self.record(
-                            frame,
-                            &function.id,
-                            site,
-                            "field_store",
-                            ObligationStatus::Unverified,
-                            "Field write receiver identity is unresolved",
-                            vec![],
-                            None,
-                        );
+                        if !self.benign_unknowns {
+                            taint(&mut state, &[], site, "Unresolved field write receiver");
+                            self.record(
+                                frame,
+                                &function.id,
+                                site,
+                                "field_store",
+                                ObligationStatus::Unverified,
+                                "Field write receiver identity is unresolved",
+                                vec![],
+                                None,
+                            );
+                        }
                         continue;
                     }
                 }
@@ -931,6 +935,9 @@ impl Solver<'_> {
                             || (guarded && capability_mask & TRANSFERRED != 0)
                             || (matches!(instruction.kind, Kind::CloseIfUnborrowed { .. })
                                 && loan_mask != AVAILABLE);
+                        if unverified && self.benign_unknowns {
+                            continue;
+                        }
                         if unverified {
                             taint(
                                 &mut state,
@@ -970,6 +977,9 @@ impl Solver<'_> {
                         );
                     }
                     Kind::GlobalMutationUnknown { reason } => {
+                        if self.benign_unknowns {
+                            continue;
+                        }
                         taint(&mut state, &[], site, reason);
                         self.record(
                             frame,
@@ -983,6 +993,9 @@ impl Solver<'_> {
                         );
                     }
                     Kind::Unknown { affected, reason } => {
+                        if self.benign_unknowns {
+                            continue;
+                        }
                         taint(&mut state, affected, site, reason);
                         self.record(
                             frame,
@@ -1191,6 +1204,9 @@ impl Solver<'_> {
                         self.record(frame, &function.id, site, "loan_release", if known { ObligationStatus::Verified } else { ObligationStatus::Unverified }, if known { "Release ends this view, preserving independently derived views and the owner resource" } else { "Release receiver or effects unresolved" }, vec![], None);
                     }
                     Kind::Transfer { .. } => {
+                        if self.benign_unknowns {
+                            continue;
+                        }
                         taint(
                             &mut state,
                             &[],
@@ -1224,10 +1240,9 @@ impl Solver<'_> {
                             _ => None,
                         };
                         if let Some(called) = self
-                            .program
-                            .functions
-                            .iter()
-                            .find(|f| f.id == *callee)
+                            .function_index
+                            .get(callee)
+                            .map(|index| &self.program.functions[*index])
                             .cloned()
                             .filter(|called| {
                                 !stack.contains(callee)
@@ -1333,7 +1348,7 @@ impl Solver<'_> {
                                 if let Some(target) = target {
                                     store_binding(&mut state, target, returned);
                                 }
-                            } else {
+                            } else if !self.benign_unknowns {
                                 taint(
                                     &mut state,
                                     args,
@@ -1351,7 +1366,7 @@ impl Solver<'_> {
                                     );
                                 }
                             }
-                            if child_may_raise && unwind.is_none() {
+                            if child_may_raise && unwind.is_none() && !self.benign_unknowns {
                                 // Legacy Call has no exceptional successor. Keep that
                                 // coverage gap visible even when a normal return exists.
                                 taint(
@@ -1368,31 +1383,39 @@ impl Solver<'_> {
                                         && o.status == ObligationStatus::Unverified
                                 });
                             // Expose nested gaps at the call site for coverage-sensitive comparison.
-                            self.record(
-                                frame,
-                                &function.id,
-                                site,
-                                "call",
-                                if incomplete {
-                                    ObligationStatus::Unverified
-                                } else {
-                                    ObligationStatus::Verified
-                                },
-                                if child_may_raise && unwind.is_none() {
-                                    "Callee exceptional exit is not dispatched"
-                                } else if incomplete {
-                                    "Callee contains unverified operations"
-                                } else {
-                                    "Resolved callee resource effects propagated"
-                                },
-                                vec![],
-                                None,
-                            );
+                            if !self.benign_unknowns || !incomplete {
+                                self.record(
+                                    frame,
+                                    &function.id,
+                                    site,
+                                    "call",
+                                    if incomplete {
+                                        ObligationStatus::Unverified
+                                    } else {
+                                        ObligationStatus::Verified
+                                    },
+                                    if child_may_raise && unwind.is_none() {
+                                        "Callee exceptional exit is not dispatched"
+                                    } else if incomplete {
+                                        "Callee contains unverified operations"
+                                    } else {
+                                        "Resolved callee resource effects propagated"
+                                    },
+                                    vec![],
+                                    None,
+                                );
+                            }
                             if no_return && child_may_raise {
                                 normal_continuation = false;
                                 break;
                             }
                         } else {
+                            if self.benign_unknowns {
+                                if let Some(target) = target {
+                                    store_binding(&mut state, target, missing());
+                                }
+                                continue;
+                            }
                             taint(
                                 &mut state,
                                 &[],
@@ -1547,14 +1570,50 @@ impl Solver<'_> {
 /// Analyze entry roots without running target-language code. Unbound root
 /// parameters are unknown; resolved callers instantiate those parameters.
 pub fn analyze(program: &Program) -> Analysis {
+    analyze_with_unknown_policy(program, false)
+}
+
+/// Unsound high-precision lint mode. Unsupported and unresolved behavior is a
+/// no-op over tracked state, so only findings supported by modeled effects are
+/// returned. This function intentionally makes no completeness claim.
+pub fn lint(program: &Program) -> Analysis {
+    analyze_with_unknown_policy(program, true)
+}
+
+fn analyze_with_unknown_policy(program: &Program, benign_unknowns: bool) -> Analysis {
+    let function_index: BTreeMap<_, _> = program
+        .functions
+        .iter()
+        .enumerate()
+        .map(|(index, function)| (function.id.clone(), index))
+        .collect();
+    let loan_mode = program
+        .functions
+        .iter()
+        .flat_map(|function| &function.blocks)
+        .flat_map(|block| &block.operations)
+        .any(|instruction| matches!(instruction.kind, Kind::Borrow { .. }));
+    let ownership_mode = loan_mode
+        || program
+            .functions
+            .iter()
+            .flat_map(|function| &function.blocks)
+            .flat_map(|block| &block.operations)
+            .any(|instruction| matches!(instruction.kind, Kind::TransferTo { .. }));
     let mut solver = Solver {
         program,
+        function_index,
         obligations: BTreeMap::new(),
         findings: BTreeMap::new(),
         steps: 0,
+        benign_unknowns,
     };
     for root in &program.roots {
-        if let Some(function) = program.functions.iter().find(|f| f.id == *root) {
+        if let Some(function) = solver
+            .function_index
+            .get(root)
+            .map(|index| &program.functions[*index])
+        {
             if function.entry >= function.blocks.len() {
                 let site = Site {
                     path: root.clone(),
@@ -1576,19 +1635,6 @@ pub fn analyze(program: &Program) -> Analysis {
             solver.steps = 0;
             // Inventory permission obligations before as well as after transfer,
             // so moving an access before transfer yields an explicit repair proof.
-            let loan_mode = program
-                .functions
-                .iter()
-                .flat_map(|f| &f.blocks)
-                .flat_map(|b| &b.operations)
-                .any(|i| matches!(i.kind, Kind::Borrow { .. }));
-            let ownership_mode = loan_mode
-                || program
-                    .functions
-                    .iter()
-                    .flat_map(|f| &f.blocks)
-                    .flat_map(|b| &b.operations)
-                    .any(|i| matches!(i.kind, Kind::TransferTo { .. }));
             solver.run(
                 function,
                 State {

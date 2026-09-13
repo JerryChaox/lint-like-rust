@@ -48,6 +48,8 @@ struct Cli {
 #[derive(Subcommand)]
 enum Command {
     Check(Check),
+    /// Unsound best-effort linting; unsupported behavior is treated as benign.
+    Lint(cli_v2::LintArgs),
     /// Experimental project-level v2 analysis (exit 3 means unverified).
     Analyze(cli_v2::AnalyzeArgs),
     /// Compare v2 proof reports; missing diagnostics are not proof of repair.
@@ -110,6 +112,7 @@ fn main() {
             0
         }
         Command::Check(args) => run(args),
+        Command::Lint(args) => cli_v2::lint(args),
         Command::Analyze(args) => cli_v2::analyze(args),
         Command::Compare(args) => cli_v2::compare(args),
     };

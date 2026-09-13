@@ -142,3 +142,88 @@ fn invalid_entry_is_error_not_empty_success() {
         Some(2)
     );
 }
+
+#[test]
+fn lint_reports_life001_with_actionable_evidence() {
+    let d = tempfile::tempdir().unwrap();
+    let p = d.path().join("main.py");
+    fs::write(
+        &p,
+        "def run():\n    f=open('x')\n    f.close()\n    f.read()\n",
+    )
+    .unwrap();
+    let output = run(&["lint", p.to_str().unwrap(), "--format", "json"]);
+    assert_eq!(output.status.code(), Some(1));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    let finding = &report["findings"][0];
+    assert_eq!(finding["rule"], "LIFE001");
+    assert_eq!(finding["location"]["line"], 4);
+    assert!(finding["evidence_chain"].as_array().unwrap().len() >= 2);
+    assert!(finding["suggested_fix"].as_str().unwrap().contains("close"));
+}
+
+#[test]
+fn lint_treats_unknown_effect_as_benign_without_exit_three() {
+    let d = tempfile::tempdir().unwrap();
+    let p = d.path().join("main.py");
+    fs::write(
+        &p,
+        "from external import opaque\ndef run():\n    f=open('x')\n    opaque(f)\n    f.read()\n",
+    )
+    .unwrap();
+    let path = p.to_str().unwrap();
+    assert_eq!(
+        run(&["analyze", path, "--entry", "main::run"])
+            .status
+            .code(),
+        Some(3)
+    );
+    let output = run(&["lint", path, "--entry", "main::run", "--format", "json"]);
+    assert_eq!(output.status.code(), Some(0));
+    let report: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert!(report["findings"].as_array().unwrap().is_empty());
+}
+
+#[test]
+fn lint_preserves_analyze_violation() {
+    let d = tempfile::tempdir().unwrap();
+    let p = d.path().join("main.py");
+    fs::write(
+        &p,
+        "def run():\n    f=open('x')\n    f.close()\n    f.write('x')\n",
+    )
+    .unwrap();
+    let path = p.to_str().unwrap();
+    assert_eq!(
+        run(&["analyze", path, "--entry", "main::run"])
+            .status
+            .code(),
+        Some(1)
+    );
+    assert_eq!(
+        run(&["lint", path, "--entry", "main::run"]).status.code(),
+        Some(1)
+    );
+}
+
+#[test]
+fn lint_does_not_promote_joined_possible_evidence_to_a_finding() {
+    let d = tempfile::tempdir().unwrap();
+    let p = d.path().join("main.py");
+    fs::write(
+        &p,
+        "def run():\n    f=open('x')\n    try:\n        f.close()\n    except:\n        pass\n    f.read()\n",
+    )
+    .unwrap();
+    let path = p.to_str().unwrap();
+    assert_eq!(
+        run(&["analyze", path, "--entry", "main::run"])
+            .status
+            .code(),
+        Some(1)
+    );
+    assert_eq!(
+        run(&["lint", path, "--entry", "main::run"]).status.code(),
+        Some(0)
+    );
+}

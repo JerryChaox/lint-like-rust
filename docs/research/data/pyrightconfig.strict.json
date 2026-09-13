@@ -1,0 +1,15 @@
+{
+  "typeCheckingMode": "strict",
+  "pythonVersion": "3.12",
+  "useLibraryCodeForTypes": true,
+  "extraPaths": [
+    "apps/api",
+    "apps/agents",
+    "apps/mobile-agent",
+    "apps/render-service",
+    "apps/sandbox-runtime",
+    "packages/museon-alerting",
+    "packages/museon-rendering",
+    "packages/museon-sandbox-contract"
+  ]
+}
