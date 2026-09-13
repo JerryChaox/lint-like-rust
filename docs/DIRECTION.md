@@ -43,3 +43,14 @@
 - [PyFlow (arXiv 2608.07026)](https://arxiv.org/abs/2608.07026)：Python 的 IFDS 跨函数分析框架，只演示了 taint。若 N1 选出的规则需要跨函数数据流，参考其 IR 与求解器设计，不自研求解器。
 - [DataFlowBench](https://github.com/BrokkAi/dataflowbench)：typestate 赛道尚无用例；Python 上的资源 typestate 检查目前是空白。
 - Ruff 无插件机制（[FAQ](https://docs.astral.sh/ruff/faq/)）。AST 级通用规则的归宿是贡献上游；Rust 底座候选为 `ruff_python_parser` + `ruff_python_semantic`，类型从 Pyright/ty 取。
+
+## 结论与归档（2026-09-13）
+
+N1 对 Museon 30 个真实修复提交的分类：Ruff 命中 1/30，Pyright strict 0/30；零个属于资源生命周期、漏 await 这类语言级语义错误，21/30 是外部契约、状态分支、分页完整性、部署环境这类系统边界问题。N2 用现有规则 best-effort 扫 Museon 4580 个文件，0 条发现。
+
+判断：
+- Rust 式规则只对直接管理内核/原生资源生命周期的代码有意义（数据管道、训练脚本、原生 GUI 胶水层）。业务后端把生命周期交给了框架和 SDK，没有可检查的对象。
+- Museon 静态工具的天花板约为 10/30，由四条配置级改动达到：从 Supabase schema 生成 Pydantic 模型、Pyright strict、禁 Any（ANN401）、SQL 走类型化查询层，加 Ruff BLE001。其余 20 个需要真实依赖的契约测试、运行时不变量与状态矩阵设计，任何 linter 都不覆盖。
+- 项目特有模式（同步 client 不许 await、ACK 前必须写终态）用 Semgrep 写一两条规则即可，不值得独立工具。
+
+项目归档。若将来面向数据管道/训练脚本重启，先按 N1 的方法拿目标用户的真实 bug 历史验证需求，再写代码。

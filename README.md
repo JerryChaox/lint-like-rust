@@ -1,5 +1,7 @@
 # lint-like-rust
 
+> **已归档（2026-09-13）。** 项目结论：Rust 风格的所有权/借用/生命周期规则只对自己管理资源生命周期的代码有意义；业务后端代码的错误在系统边界契约上，静态 lint 看不到。对 Museon 30 个真实修复提交的分类见 [docs/research/museon-bug-taxonomy.md](docs/research/museon-bug-taxonomy.md)，方向演变与结论见 [docs/DIRECTION.md](docs/DIRECTION.md)。代码保留供参考，不再维护。
+
 面向 Python 的 Rust 风格所有权、借用和资源有效期检查器。核心以 Rust 编写，消费语言无关的中间表示；Python 是第一个前端。
 
 这是一个早期静态分析项目。默认不需要修改业务源码或添加标注，使用已知 API 模型和可解析函数效果；可选项目契约用于补充无法推断的所有权边界。检查器不执行或导入目标 Python 代码。
